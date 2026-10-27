@@ -1,0 +1,160 @@
+*rex-navigator.txt*  Seamlessly switch between Rex panes and Neovim splits
+
+==============================================================================
+CONTENTS                                               *rex-navigator-contents*
+
+    1. Introduction ............................... |rex-navigator-introduction|
+    2. Installation ............................... |rex-navigator-installation|
+    3. Configuration .............................. |rex-navigator-configuration|
+    4. Commands ................................... |rex-navigator-commands|
+    5. Lua API .................................... |rex-navigator-api|
+    6. Health Check ............................... |rex-navigator-health|
+
+==============================================================================
+1. INTRODUCTION                                   *rex-navigator-introduction*
+
+rex-navigator.nvim provides seamless navigation between Neovim split windows
+and Rex terminal multiplexer blocks/panes.
+
+When you attempt to navigate past the edge of a Neovim split window,
+rex-navigator automatically hands off focus to the adjacent Rex pane in
+the same direction.
+
+==============================================================================
+2. INSTALLATION                                   *rex-navigator-installation*
+
+Using lazy.nvim:
+>lua
+    {
+      "charukak/rex-navigator.nvim", -- or your local repo path
+      event = "VeryLazy",
+      opts = {
+        set_default_keymaps = true,
+      },
+    }
+<
+
+Using vim-plug:
+>vim
+    Plug 'charukak/rex-navigator.nvim'
+<
+
+==============================================================================
+3. CONFIGURATION                                 *rex-navigator-configuration*
+
+To configure rex-navigator, call `setup()` in your `init.lua`:
+
+>lua
+    require("rex-navigator").setup({
+      -- Automatically register default keymaps (<C-h>, <C-j>, <C-k>, <C-l>, <C-\>)
+      set_default_keymaps = true,
+
+      -- Modes to set keymaps for ("n" for normal mode, "t" for terminal mode)
+      modes = { "n", "t" },
+
+      -- Wrap focus around screen edges when in Rex
+      wrap_at_edge = true,
+
+      -- Disable navigation when current Neovim window is zoomed
+      disable_when_zoomed = false,
+
+      -- Allow navigation when focus is in a floating window
+      navigate_floating_windows = false,
+
+      -- Custom keybindings
+      keybindings = {
+        left = "<C-h>",
+        down = "<C-j>",
+        up = "<C-k>",
+        right = "<C-l>",
+        previous = "<C-\\>",
+        next = "<C-Space>",
+      },
+    })
+<
+
+==============================================================================
+4. COMMANDS                                           *rex-navigator-commands*
+
+`:RexNavigateLeft`
+    Focus Neovim split or Rex pane to the left.
+
+`:RexNavigateDown`
+    Focus Neovim split or Rex pane below.
+
+`:RexNavigateUp`
+    Focus Neovim split or Rex pane above.
+
+`:RexNavigateRight`
+    Focus Neovim split or Rex pane to the right.
+
+`:RexNavigatePrevious`
+    Focus previous Neovim split or Rex pane.
+
+`:RexNavigateNext`
+    Focus next Neovim split or Rex pane.
+
+`:RexSplitLeft`
+    Split a new Rex pane to the left.
+
+`:RexSplitRight`
+    Split a new Rex pane to the right.
+
+`:RexSplitAbove`
+    Split a new Rex pane above.
+
+`:RexSplitBelow`
+    Split a new Rex pane below.
+
+`:RexZoomToggle`
+    Toggle zoom state of the current Rex pane.
+
+`:RexInfo`
+    Show rex-navigator integration status and diagnostics.
+
+==============================================================================
+5. LUA API                                                 *rex-navigator-api*
+
+`require("rex-navigator").setup(opts)`
+    Initialize rex-navigator with options.
+
+`require("rex-navigator").focus(direction)`
+    Focus in the given direction ("left", "down", "up", "right", "previous", "next").
+
+`require("rex-navigator").focus_left()`
+    Focus left.
+
+`require("rex-navigator").focus_down()`
+    Focus down.
+
+`require("rex-navigator").focus_up()`
+    Focus up.
+
+`require("rex-navigator").focus_right()`
+    Focus right.
+
+`require("rex-navigator").focus_previous()`
+    Focus previous.
+
+`require("rex-navigator").focus_next()`
+    Focus next.
+
+`require("rex-navigator").split(direction)`
+    Split a new Rex pane ("right", "left", "above", "below").
+
+`require("rex-navigator").zoom_toggle()`
+    Toggle Rex zoom state.
+
+`require("rex-navigator").info()`
+    Print status and environment diagnostics.
+
+==============================================================================
+6. HEALTH CHECK                                     *rex-navigator-health*
+
+Run `:checkhealth rex-navigator` inside Neovim to verify that:
+  - You are running inside a Rex terminal session
+  - The `rex` executable can be found in `$PATH` or `$REX_BIN_DIR`
+  - Rex environment variables are properly initialized
+
+==============================================================================
+vim:tw=78:ts=8:ft=help:norl:
