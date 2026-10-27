@@ -9,8 +9,11 @@ M.defaults = {
   -- Modes in which keymaps will be set (e.g. normal and terminal mode)
   modes = { "n", "t" },
 
-  -- Wrap around at edges when navigating in Rex (default false to prevent accidental wrapping)
+  -- Wrap around at edges when navigating in Rex
   wrap_at_edge = false,
+
+  -- Switch Neovim file buffers (:bnext / :bprevious) when in single window split
+  switch_buffers = true,
 
   -- Disable navigation when current window is zoomed/maximized
   disable_when_zoomed = false,
