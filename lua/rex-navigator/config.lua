@@ -9,8 +9,8 @@ M.defaults = {
   -- Modes in which keymaps will be set (e.g. normal and terminal mode)
   modes = { "n", "t" },
 
-  -- Wrap around at edges when navigating in Rex
-  wrap_at_edge = true,
+  -- Wrap around at edges when navigating in Rex (default false to prevent accidental wrapping)
+  wrap_at_edge = false,
 
   -- Disable navigation when current window is zoomed/maximized
   disable_when_zoomed = false,
