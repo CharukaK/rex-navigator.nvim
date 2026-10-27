@@ -61,7 +61,7 @@ require("rex-navigator").setup({
   modes = { "n", "t" },
 
   -- Wrap focus around screen edges when navigating in Rex
-  wrap_at_edge = true,
+  wrap_at_edge = false,
 
   -- Disable navigation when current Neovim window is zoomed / maximized
   disable_when_zoomed = false,
