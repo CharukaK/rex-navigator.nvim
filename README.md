@@ -4,7 +4,7 @@ Seamlessly switch between **[Rex](https://superlogical.com/rex)** panes and **Ne
 
 When you attempt to navigate past the edge of a Neovim split window, `rex-navigator.nvim` automatically hands off focus to the adjacent Rex pane in that direction.
 
-Inspired by [nvim-tmux-navigation](https://github.com/alexghergh/nvim-tmux-navigation) and [smart-splits.nvim](https://github.com/mrjones2014/smart-splits.nvim).
+Inspired by [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator).
 
 ---
 
@@ -16,6 +16,7 @@ Inspired by [nvim-tmux-navigation](https://github.com/alexghergh/nvim-tmux-navig
 - **Floating & Zoom Handling**: Configurable behavior for zoomed windows and floating windows (e.g. Telescope, Lazy, hover popups).
 - **Graceful Fallback**: Functions as standard Neovim split navigation when running outside Rex.
 - **Extra Rex Commands**: Split new Rex panes or toggle Rex pane zoom directly from inside Neovim (`:RexSplitRight`, `:RexZoomToggle`, etc.).
+- **Rex-side Handoff**: The included Rex module sends navigation keys into Neovim and focuses Rex panes everywhere else.
 - **Health Check Support**: Built-in `:checkhealth rex-navigator` diagnostic integration.
 
 ---
@@ -85,23 +86,19 @@ require("rex-navigator").setup({
 
 ## 🖥️ Rex Keybindings Setup (`~/.config/rex/init.lua`)
 
-To enable seamless directional navigation across non-Neovim Rex panes as well, configure directional bindings in your Rex configuration (`~/.config/rex/init.lua`):
+Copy this repository's `rex-navigator.lua` to `~/.config/rex/rex-navigator.lua`, then load it from `~/.config/rex/init.lua`:
 
 ```lua
--- ~/.config/rex/init.lua
-
--- Directional pane navigation
-rex.bind("ctrl+h", "pane.focus.left")
-rex.bind("ctrl+j", "pane.focus.down")
-rex.bind("ctrl+k", "pane.focus.up")
-rex.bind("ctrl+l", "pane.focus.right")
-
--- Arrow keys or Alt/Cmd alternatives
-rex.bind("cmd+alt+h", "pane.focus.left")
-rex.bind("cmd+alt+j", "pane.focus.down")
-rex.bind("cmd+alt+k", "pane.focus.up")
-rex.bind("cmd+alt+l", "pane.focus.right")
+require("rex-navigator").setup()
 ```
+
+Reload Rex configuration:
+
+```sh
+rex config reload
+```
+
+The Rex module binds `Ctrl-h/j/k/l/\\`. When the focused terminal is running Neovim, the binding returns the key to Neovim. Otherwise it moves Rex focus. Neovim first tries its own split and calls `rex focus` only at an edge.
 
 ---
 

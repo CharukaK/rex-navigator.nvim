@@ -24,55 +24,6 @@ local dir_to_rex = {
   next = "next",
 }
 
---- Get active listed buffers in Neovim
----@return table
-local function get_listed_buffers()
-  local bufs = vim.fn.getbufinfo({ buflisted = 1 })
-  local valid = {}
-  for _, b in ipairs(bufs) do
-    if b.hidden == 1 or b.loaded == 1 or b.changed == 1 then
-      table.insert(valid, b.bufnr)
-    end
-  end
-  return valid
-end
-
---- Cycle through listed file buffers in direction
----@param direction string
----@return boolean
-local function cycle_buffer(direction)
-  local bufs = get_listed_buffers()
-  if #bufs <= 1 then
-    return false
-  end
-
-  local cur = vim.api.nvim_get_current_buf()
-  local idx = 1
-  for i, bufnr in ipairs(bufs) do
-    if bufnr == cur then
-      idx = i
-      break
-    end
-  end
-
-  local next_idx
-  if direction == "right" or direction == "next" then
-    next_idx = (idx % #bufs) + 1
-  else
-    next_idx = idx - 1
-    if next_idx < 1 then
-      next_idx = #bufs
-    end
-  end
-
-  local target_buf = bufs[next_idx]
-  if target_buf and target_buf ~= cur then
-    local pcall_ok = pcall(vim.api.nvim_set_current_buf, target_buf)
-    return pcall_ok
-  end
-  return false
-end
-
 --- Set up keymaps based on configuration
 local function set_keymaps()
   local opts = config.options
@@ -113,7 +64,7 @@ function M.setup(user_opts)
   set_keymaps()
 end
 
---- Focus window, buffer, or block in specified direction
+--- Focus a Neovim window first, then a Rex block at the window edge
 ---@param direction string "left"|"down"|"up"|"right"|"previous"|"next" or "h"|"j"|"k"|"l"|"p"|"n"
 function M.focus(direction)
   direction = utils.norm_dir(direction)
@@ -144,22 +95,18 @@ function M.focus(direction)
     return
   end
 
-  -- 2. If window didn't change and switch_buffers is true, try switching file buffers
-  if opts.switch_buffers and (direction == "right" or direction == "left" or direction == "next" or direction == "previous") then
-    if cycle_buffer(direction) then
-      return
-    end
-  end
-
-  -- 3. If Neovim window and file buffer did not change, switch Rex block
+  -- 2. At a Neovim edge, switch the Rex block that owns this process.
   if utils.is_rex() then
     local rex_dir = dir_to_rex[direction]
     if rex_dir then
-      local args = { "focus", rex_dir }
+      local args = { "focus", "-s", vim.env.REX_SESSION, rex_dir }
       if opts.wrap_at_edge then
         table.insert(args, "--wrap")
       end
-      utils.run_rex_cmd(args)
+      local ok, err = utils.run_rex_cmd(args)
+      if not ok then
+        vim.notify("rex-navigator: Failed to focus Rex pane: " .. tostring(err), vim.log.levels.ERROR)
+      end
     end
   end
 end
@@ -198,7 +145,7 @@ function M.split(direction)
   end
 
   direction = direction or "right"
-  local args = { "split", "--split=" .. direction }
+  local args = { "split", "-s", vim.env.REX_SESSION, "-b", vim.env.REX_BLOCK, "--split=" .. direction }
   local ok, err = utils.run_rex_cmd(args)
   if not ok then
     vim.notify("rex-navigator: Failed to split Rex pane: " .. tostring(err), vim.log.levels.ERROR)
@@ -212,7 +159,7 @@ function M.zoom_toggle()
     return
   end
 
-  local ok, err = utils.run_rex_cmd({ "zoom" })
+  local ok, err = utils.run_rex_cmd({ "zoom", "-s", vim.env.REX_SESSION, vim.env.REX_BLOCK })
   if not ok then
     vim.notify("rex-navigator: Failed to toggle Rex zoom: " .. tostring(err), vim.log.levels.ERROR)
   end
@@ -232,7 +179,6 @@ function M.info()
     "REX_SERVER:         " .. (vim.env.REX_SERVER or "unset"),
     "REX_BIN_DIR:        " .. (vim.env.REX_BIN_DIR or "unset"),
     "Wrap at Edge:       " .. tostring(config.options.wrap_at_edge),
-    "Switch Buffers:     " .. tostring(config.options.switch_buffers),
     "Disable when Zoomed:" .. tostring(config.options.disable_when_zoomed),
   }
 

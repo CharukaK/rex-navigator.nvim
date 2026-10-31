@@ -39,6 +39,15 @@ Using vim-plug:
     Plug 'charukak/rex-navigator.nvim'
 <
 
+Copy `rex-navigator.lua` from this repository to `~/.config/rex/`, add this to
+`~/.config/rex/init.lua`, and run `rex config reload`:
+>lua
+    require("rex-navigator").setup()
+<
+
+The Rex bindings send Ctrl-h/j/k/l/\\ to Neovim when Neovim owns the focused
+terminal. Otherwise, Rex moves directly between panes.
+
 ==============================================================================
 3. CONFIGURATION                                 *rex-navigator-configuration*
 
@@ -53,7 +62,7 @@ To configure rex-navigator, call `setup()` in your `init.lua`:
       modes = { "n", "t" },
 
       -- Wrap focus around screen edges when in Rex
-      wrap_at_edge = true,
+      wrap_at_edge = false,
 
       -- Disable navigation when current Neovim window is zoomed
       disable_when_zoomed = false,

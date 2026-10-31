@@ -1,0 +1,6 @@
+#!/bin/sh
+set -eu
+repo=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+
+lua "$repo/tests/navigation_spec.lua" "$repo"
+lua "$repo/tests/rex_config_spec.lua" "$repo"

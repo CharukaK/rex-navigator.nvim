@@ -29,19 +29,10 @@ end
 --- Check if running inside a Rex terminal session
 ---@return boolean
 function M.is_rex()
-  if vim.env.TERM_PROGRAM == "rex" then
-    return true
-  end
-  if vim.env.REX_SESSION ~= nil and vim.env.REX_SESSION ~= "" then
-    return true
-  end
-  if vim.env.REX_SERVER ~= nil and vim.env.REX_SERVER ~= "" then
-    return true
-  end
-  if vim.env.REX_BLOCK ~= nil and vim.env.REX_BLOCK ~= "" then
-    return true
-  end
-  return false
+  return vim.env.REX_SESSION ~= nil
+    and vim.env.REX_SESSION ~= ""
+    and vim.env.REX_BLOCK ~= nil
+    and vim.env.REX_BLOCK ~= ""
 end
 
 --- Locate the Rex CLI executable path
@@ -75,7 +66,7 @@ function M.run_rex_cmd(args)
 
   local output = vim.fn.system(cmd)
   local exit_code = vim.v.shell_error
-  return exit_code == 0, output
+  return exit_code == 0, vim.trim(output)
 end
 
 --- Check if the given window ID (or current window) is a floating window
